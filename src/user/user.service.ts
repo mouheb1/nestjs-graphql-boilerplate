@@ -39,6 +39,6 @@ export class UserService {
   }
 
   delete(id: string) {
-    return this.userRepository.delete({ id });
+    return this.userRepository.softDelete({ id });
   }
 }

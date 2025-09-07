@@ -67,5 +67,17 @@ export class {{pascalCase tableName}}Resolver {
   ) {
     return this.{{tableName}}Service.delete(id);
   }
+      
+  @Mutation(() => GraphQLJSON)
+  @UseAuthGuard(UserRole.ADMIN)
+  restore{{pascalCase tableName}}(@Args('id') 
+  {{#if (is "increment" idType)}}
+    id: number,
+  {{else}}
+    id: string,
+  {{/if}}
+  ) {
+    return this.{{tableName}}Service.restore(id);
+  }
 }
     

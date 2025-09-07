@@ -114,4 +114,16 @@ describe('{{pascalCase tableName}}Resolver', () => {
 
     expect(mockedService.delete).toHaveBeenCalledWith(id)
   })
+
+  it('Calling "Restore {{tableName}}" method', () => {
+{{#if (is "increment" idType)}}
+    const id = utilService.getRandomNumber(0,999999);
+{{else}}
+    const id = utilService.getRandomUUID;
+{{/if}}
+
+    resolver.restore{{pascalCase tableName}}(id)
+
+    expect(mockedService.restore).toHaveBeenCalledWith(id)
+  })
 })

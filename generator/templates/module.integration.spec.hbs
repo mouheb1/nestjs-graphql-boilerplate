@@ -263,4 +263,34 @@ describe('{{pascalCase tableName}}Module', () => {
         expect(data[keyName].affected).toBe(1);
       });
   });
+
+  it('restore', async () => {
+    const keyName = 'restore{{pascalCase tableName}}';
+  
+    const gqlQuery = {
+      query: `,
+        mutation ($id: 
+{{#if (is "increment" idType)}}
+        Float
+{{else}}
+        String
+{{/if}}
+        !) {
+          ${keyName}(id: $id),
+        }
+     `,
+      variables: {
+        id: savedId,
+      },
+    };
+  
+    await request(app.getHttpServer())
+      .post('/graphql')
+      .send(gqlQuery)
+      .set('Content-Type', 'application/json')
+      .expect(HttpStatus.OK)
+      .expect(({ body: { data } }) => {
+        expect(data[keyName].affected).toBe(1);
+      });
+  });
 });

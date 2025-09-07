@@ -104,6 +104,18 @@ describe('{{pascalCase tableName}}Service', () => {
 
     service.delete(id)
 
-    expect(mockedRepository.delete).toHaveBeenCalledWith({ id })
+    expect(mockedRepository.softDelete).toHaveBeenCalledWith({ id })
+  })
+
+  it('Calling "Restore" method', () => {
+{{#if (is "increment" idType)}}
+    const id = utilService.getRandomNumber(0,999999);
+{{else}}
+    const id = utilService.getRandomUUID;
+{{/if}}
+
+    service.restore(id)
+
+    expect(mockedRepository.restore).toHaveBeenCalledWith({ id })
   })
 })

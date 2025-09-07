@@ -11,11 +11,13 @@ import { TypeORMConfigService } from './common/config/ormconfig.service';
 import { getEnvPath } from './common/helper/env.helper';
 import { envValidation } from './common/helper/env.validation';
 import { HealthModule } from './health/health.module';
+import { OrganizationModule } from './organization/organization.module';
 import { UploadModule } from './upload/upload.module';
 import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    OrganizationModule,
     ConfigModule.forRoot({
       envFilePath: getEnvPath(`${__dirname}/..`),
       validate: envValidation,

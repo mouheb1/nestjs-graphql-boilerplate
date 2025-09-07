@@ -43,6 +43,16 @@ constructor(private readonly {{tableName}}Repository: {{pascalCase tableName}}Re
     id: string,
 {{/if}}
   ) {
-    return this.{{tableName}}Repository.delete({ id })
+    return this.{{tableName}}Repository.softDelete({ id })
+  }
+
+  restore(
+{{#if (is "increment" idType)}}
+    id: number,
+{{else}}
+    id: string,
+{{/if}}
+  ) {
+    return this.{{tableName}}Repository.restore({ id })
   }
 }
