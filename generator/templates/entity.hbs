@@ -3,6 +3,9 @@ import {
 {{#if (isIn "createdAt" columnList)}}
   CreateDateColumn,
 {{/if}}
+{{#if (isIn "deletedAt" columnList)}}
+  DeleteDateColumn,
+{{/if}}
   Entity,
   PrimaryGeneratedColumn,
 {{#if (isIn "updatedAt" columnList)}}
@@ -52,6 +55,13 @@ export class {{pascalCase tableName}} {
       type: 'timestamp with time zone',
     })
     updatedAt: Date;
+{{/if}}
+{{#if (isIn "deletedAt" columnList)}}
+    @Field()
+    @DeleteDateColumn({
+      type: 'timestamp with time zone',
+    })
+    deletedAt: Date;
 {{/if}}
 
 }
