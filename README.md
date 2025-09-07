@@ -1,371 +1,527 @@
-# NestJS/TypeORM/GraphQL/PostgreSQL
+# NestJS GraphQL Boilerplate
 
-NestJS boilerplate with TypeORM, GraphQL and PostgreSQL
+A production-ready NestJS boilerplate with TypeORM, GraphQL, and PostgreSQL for rapid API development.
 
-## Table of Contents
+## 🚀 Quick Start
 
-- [1. Open for Contribution](#1-open-for-contribution)
+### Prerequisites
 
-- [2. Getting Started](#2-getting-started)
+- Node.js >= 22.0
+- Docker & Docker Compose
+- PostgreSQL (or use Docker)
 
-  - [2.1. Installation](#21-installation)
-  - [2.2. Run](#22-run)
+### Installation
 
-- [3. Docker](#3-docker)
-
-  - [3.1. Docker Compose Installation](#31-docker-compose-installation)
-  - [3.2. Before Getting Started](#32-before-getting-started)
-  - [3.3. Run](#33-run)
-  - [3.4. Note](#34-note)
-  - [3.5. Run Only Database (Local Dev)](#35-run-only-database-local-dev)
-
-- [4. NestJS](#4-nestjs)
-
-- [5. PostgreSQL Database](#5-postgresql-database)
-
-- [6. TypeORM](#6-typeorm)
-
-  - [6.1. Migration Setup and Usage](#61-migration-setup-and-usage)
-
-- [7. GraphQL](#7-graphql)
-
-  - [7.1. Protected Queries/Mutation By Role](#71-protected-queriesmutation-by-role)
-  - [7.2. GraphQL Query To Select and Relations](#72-graphql-query-to-select-and-relations)
-  - [7.3. Field-Level Permission](#73-field-level-permission)
-  - [7.4. GraphQL Status Code](#74-graphql-status-code)
-
-- [8. Custom CRUD](#8-custom-crud)
-
-- [9. Code generator](#9-code-generator)
-
-- [10. Caching](#10-caching)
-
-  - [10.1. How To Use](#101-how-to-use)
-
-- [11. TDD](#11-tdd)
-
-  - [11.1. Introduction](#111-introduction)
-  - [11.2. Before Getting Started](#112-before-getting-started)
-  - [11.3. Unit Test (with mock)](#113-unit-test-with-mock)
-  - [11.4. Integration Test (with in-memory DB)](#114-integration-test-with-in-memory-db)
-  - [11.5. End To End Test (with docker)](#115-end-to-end-test-with-docker)
-
-- [12. CI](#12-ci)
-
-  - [12.1. Github Actions](#121-github-actions)
-  - [12.2. Husky v9](#122-husky-v9)
-
-- [13. SWC Compiler](#13-swc-compiler)
-
-  - [13.1. SWC + Jest error resolution](#131-swc--jest-error-resolution)
-
-- [14. Todo](#14-todo)
-
-- [15. License](#15-license)
-
-## 1. Open for Contribution
-
-Totally open for any Pull Request, please feel free to contribute in any ways.
-There can be errors related with type or something. It would be very helpful to me for you to fix these errors.
-
-## 2. Getting Started
-
-### 2.1. Installation
-
-Before you start, make sure you have a recent version of [NodeJS](http://nodejs.org/) environment _>=14.0_ with NPM 6 or Yarn.
-
-The first thing you will need is to install NestJS CLI.
+1. **Clone and install**
 
 ```bash
-$ yarn -g @nestjs/cli
+cd nestjs-graphql-boilerplate
+yarn install
 ```
 
-And do install the dependencies
+2. **Setup environment**
 
 ```bash
-$ yarn install # or npm install
+cp .example.env .development.env
+# Edit .development.env with your database credentials
 ```
 
-### 2.2. Run
-
-for development
+3. **Start database**
 
 ```bash
-$ yarn dev # or npm run dev
+# Using Docker
+docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=your_password postgres:15
+
+# Or use Docker Compose
+docker compose --env-file ./.development.env up -d
 ```
 
-for production
+4. **Run the application**
 
 ```bash
-$ yarn build # or npm run build
-$ yarn start # or npm run start
+yarn dev
 ```
 
-or run with docker following below
+**Access points:**
 
-## 3. Docker
+- API: http://localhost:8000
+- GraphQL Playground: http://localhost:8000/graphql
 
-### 3.1. Docker Compose Installation
+## 🐳 Docker Setup
 
-Download docker from [Official website](https://docs.docker.com/compose/install)
-
-### 3.2. Before Getting Started
-
-Before running Docker, you need to create an env file named `.production.env`.
-The content should be modified based on `.example.env`.
-The crucial point is that DB_HOST must be set to 'postgres'.
-
-### 3.3. Run
-
-Open terminal and navigate to project directory and run the following command.
+### Development
 
 ```bash
-# Only for production
-$ docker compose --env-file ./.production.env up
+# Start all services
+docker compose --env-file ./.development.env up -d
+
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
 ```
 
-### 3.4. Note
-
-If you want to use docker, you have to set DB_HOST in .production.env to be `postgres`.
-The default set is `postgres`
-
-### 3.5. Run Only Database (Local Dev)
-
-You can just create PostgreSQL by below code, sync with .development.env
+### Production
 
 ```bash
-$ docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=1q2w3e4r -d postgres
+# Build and deploy
+docker compose --env-file ./.production.env up --build -d
 ```
 
-## 4. [NestJS](https://docs.nestjs.com/)
-
-Base NestJS, We like it
-
-## 5. [PostgreSQL Database](https://www.postgresql.org/)
-
-We use PostgreSQL for backend database, The default database that will be used is named 'postgres'
-You have to have PostgreSQL Database server before getting started.
-You can use [Docker PostgreSQL](https://hub.docker.com/_/postgres) to have server easily
-
-## 6. [TypeORM](https://typeorm.io/)
-
-We use [Nestjs/TypeORM](https://docs.nestjs.com/techniques/database)
-In this template, We've been trying not to use `Pure SQL` to make the most of TypeORM.
-
-### 6.1. Migration Setup and Usage
-
-This project uses TypeORM's migration feature to manage database schema changes. Follow the steps below to generate and apply migrations.
-
-> **Note**
->
-> 1. The custom `typeorm` command defined in `package.json` is configured for `NODE_ENV=production`.
-> 2. Migrations are intended for production use, while `typeorm synchronize` should be used for development purposes.
-> 3. You can see the detailed configuration code [here](/src/common/config/ormconfig.ts)
-> 4. As you can see from the configuration code, migration files must be located in the subdirectory of `/src/common/database/migrations/${name}`.
-
-#### 6.1.1. Generate a migration file
-
-To reflect new changes in the database, you need to first generate a migration file.
+### Useful Commands
 
 ```bash
-yarn migration:generate ./src/common/database/migrations/init
+# Run migrations in container
+docker compose exec app yarn migration:run
+
+# Access database
+docker compose exec postgres psql -U postgres -d postgres
+
+# Rebuild specific service
+docker compose up --build app
 ```
 
-you can change the name of migration by replacing `init`
-
-#### 6.1.2. Run the Migration
-
-To apply the generated migration to the database, run the following command:
+## 📊 Database Migrations
 
 ```bash
+# Generate migration from entity changes
+yarn migration:generate ./src/common/database/migrations/migration_name
+
+# Run pending migrations
 yarn migration:run
-```
 
-#### 6.1.3. Revert a Migration
-
-To roll back the last applied migration, use the following command:
-
-```bash
+# Revert last migration
 yarn migration:revert
-```
 
-#### 6.1.4. Check Migration Status
-
-To view the current status of your migrations, run:
-
-```bash
+# Check migration status
 yarn migration:show
 ```
 
-#### 6.1.5. Create Migration Command
+## 🔗 GraphQL API
 
-You can also directly create a migration file using the following `typeorm` command:
+**Playground**: http://localhost:8000/graphql
 
-```bash
-yarn migration:create ./src/common/database/migrations/init
-```
+### Authentication
 
-This command generates an empty migration file where you can manually add your schema changes.
-
-## 7. [GraphQL](https://graphql.org/)
-
-##### packages: graphql, apollo-server-express and @nestjs/graphql, [graphqlUpload](https://www.npmjs.com/package/graphql-upload) ...
-
-We use GraphQL in a Code First approach (our code will create the GraphQL Schemas).
-
-We don't use [swagger](https://docs.nestjs.com/openapi/introduction) now, but you can use this if you want to.
-You can see [playground](http://localhost:8000/graphql)
-
-We use Apollo Server Playground by default. If you'd prefer the original GraphQL Playground, enable it as follows:
-
-```js
-// src/common/config/graphql-config.service.ts
-
-GraphQLModule.forRootAsync <
-  ApolloDriverConfig >
-  {
-    ...
-    createGqlOptions(): Promise<ApolloDriverConfig> | ApolloDriverConfig {
-      ...
-      playground: true,
-      ...
-    }
-    ...
-  };
-```
-
-### 7.1. Protected Queries/Mutation By Role
-
-Some of the GraphQL queries are protected by a NestJS Guard (`GraphqlPassportAuthGuard`) and requires you to be authenticated (and some also requires to have the Admin role).
-You can solve them with Sending JWT token in `Http Header` with the `Authorization`.
+Include JWT token in headers for protected endpoints:
 
 ```json
-# Http Header
 {
-  "Authorization": "Bearer TOKEN"
+  "Authorization": "Bearer YOUR_JWT_TOKEN"
 }
 ```
 
-#### 7.1.1. Example Of Some Protected GraphQL
+### Key Features
 
-- getMe (must be authenticated)
-- All methods generated by the generator (must be authenticated and must be admin)
+- **Code First Approach**: Schemas generated from TypeScript code
+- **Protected Endpoints**: JWT authentication with role-based access
+- **Dynamic Query Optimization**: Automatic SELECT and JOIN optimization
+- **Advanced Filtering**: Complex WHERE conditions with operators
+- **Soft Delete**: Built-in soft delete with restore functionality
 
-### 7.2. GraphQL Query To Select and Relations
+### User CRUD Operations
 
-#### 7.2.1. Dynamic Query Optimization
+#### Create User
 
-- Automatically maps GraphQL queries to optimized SELECT and JOIN clauses in TypeORM.
-
-- Ensures that only the requested fields and necessary relations are retrieved, reducing over-fetching and improving performance.
-
-- With using interceptor (name: `UseRepositoryInterceptor`) and paramDecorator (name: `GraphQLQueryToOption`)
-
-#### 7.2.2. How to use
-
-- You can find example code in [/src/user/user.resolver.ts](/src/user/user.resolver.ts)
-
-### 7.3. Field-Level Permission
-
-The [permission guard](/src/common/decorators/query-guard.decorator.ts) is used to block access to specific fields in client requests.
-
-#### 7.3.1. Why it was created
-
-- In GraphQL, clients can request any field, which could expose sensitive information. This guard ensures that sensitive fields are protected.
-
-- It allows controlling access to specific fields based on the server's permissions.
-
-#### 7.3.2. How to use
-
-```ts
-@Query(()=>Some)
-@UseQueryPermissionGuard(Some, { something: true })
-async getManySomeList(){
-  return this.someService.getMany()
+```graphql
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    username
+    nickname
+    role
+    createdAt
+    updatedAt
+  }
 }
 ```
 
-With this API, if the client request includes the field "something," a `Forbidden` error will be triggered.
+**Variables:**
 
-#### 7.3.3. Note
+```json
+{
+  "input": {
+    "username": "john.doe",
+    "password": "securePassword123",
+    "nickname": "Johnny",
+    "role": "USER"
+  }
+}
+```
 
-There might be duplicate code when using this guard alongside `other interceptors`(name: `UseRepositoryInterceptor`) in this boilerplate. In such cases, you may need to adjust the code to ensure compatibility.
+#### Get All Users with Pagination
 
-### 7.4. GraphQL Status Code
-
-Based on the GraphQL status code standard, we write status codes accordingly.
-You can see more details [here](./graphql-status-code.md).
-
-## 8. Custom CRUD
-
-To make most of GraphQL's advantage, We created its own api, such as GetMany or GetOne.
-We tried to make it as comfortable as possible, but if you find any mistakes or improvements, please point them out or promote them.
-
-You can see detail in folder [/src/common/graphql](/src/common/graphql) files
-
-```js
-// query
-query($input:GetManyInput) {
-  getManyPlaces(input:$input){
-    data{
+```graphql
+query GetUsers($input: GetManyInput) {
+  getManyUserList(input: $input) {
+    data {
       id
-      longitude
-      count
+      username
+      nickname
+      role
+      createdAt
+      updatedAt
+    }
+    count
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "input": {
+    "pagination": { "size": 10, "page": 0 },
+    "order": { "createdAt": "DESC" }
+  }
+}
+```
+
+#### Get Single User
+
+```graphql
+query GetUser($input: GetOneInput) {
+  getOneUser(input: $input) {
+    id
+    username
+    nickname
+    role
+    createdAt
+    updatedAt
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "input": {
+    "where": {
+      "id": "user-uuid-here"
     }
   }
 }
 ```
 
-```js
-// variables
-{
-  input: {
-    pagination: {
-      size: 10,
-      page: 0, // Started from 0
-    },
-    order: { id: 'DESC' },
-    dataType: 'data', //all or count or data - default: all
-    where: {
-      id: 3,
-    },
-  },
-};
-```
+#### Update User
 
-You can see detail [here](./process-where.md).
-
-## 9. Code generator
-
-There is [CRUD Generator in NestJS](https://docs.nestjs.com/recipes/crud-generator).
-In this repository, It has its own generator with [plopjs](https://plopjs.com/documentation/).
-You can use like below.
-
-```bash
-$ yarn g
-```
-
-## 10. Caching
-
-This project provides a custom decorator that makes it easy to implement method caching in NestJS applications.
-
-1. **Caching Functionality**: Utilizes `DiscoveryService` and `MetadataScanner` to handle method caching automatically at runtime.
-2. **Usage**: Designed for use with any provider.
-3. **GraphQL Resolvers**: Resolvers are also part of providers, but due to GraphQL's internal logic, method overrides do not work. Therefore, the functionality has been replaced with an interceptor.
-
-### 10.1. How To Use
-
-```js
-@Injectable()
-export class ExampleService {
-  @Cache(...)
-  async exampleMethod(...args: unknown) {
-    ...
+```graphql
+mutation UpdateUser($id: String!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    affected
   }
 }
 ```
 
-You can find related codes [here](./src/cache/custom-cache.module.ts)
+**Variables:**
+
+```json
+{
+  "id": "user-uuid-here",
+  "input": {
+    "nickname": "New Nickname",
+    "role": "ADMIN"
+  }
+}
+```
+
+#### Delete User (Soft Delete)
+
+```graphql
+mutation DeleteUser($id: String!) {
+  deleteUser(id: $id) {
+    affected
+  }
+}
+```
+
+#### Get Current User Profile
+
+```graphql
+query GetMe {
+  getMe {
+    id
+    username
+    nickname
+    role
+    createdAt
+    updatedAt
+  }
+}
+```
+
+### Advanced User Filtering
+
+#### Filter by Role
+
+```json
+{
+  "input": {
+    "where": {
+      "role": "ADMIN"
+    }
+  }
+}
+```
+
+#### Search by Nickname (Case-insensitive)
+
+```json
+{
+  "input": {
+    "where": {
+      "nickname": {
+        "$iContains": "john"
+      }
+    }
+  }
+}
+```
+
+#### Search by Username with Exact Match
+
+```json
+{
+  "input": {
+    "where": {
+      "username": {
+        "$eq": "john.doe"
+      }
+    }
+  }
+}
+```
+
+#### Filter by Multiple Roles
+
+```json
+{
+  "input": {
+    "where": {
+      "role": {
+        "$in": ["USER", "ADMIN"]
+      }
+    }
+  }
+}
+```
+
+#### Filter by Date Range
+
+```json
+{
+  "input": {
+    "where": {
+      "createdAt": {
+        "$gte": "2024-01-01T00:00:00.000Z",
+        "$lte": "2024-12-31T23:59:59.999Z"
+      }
+    }
+  }
+}
+```
+
+#### Complex AND/OR Filtering
+
+```json
+{
+  "input": {
+    "where": {
+      "AND": [
+        { "role": "USER" },
+        {
+          "OR": [
+            { "nickname": { "$iContains": "john" } },
+            { "username": { "$iContains": "doe" } }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+#### Pagination with Filtering and Sorting
+
+```json
+{
+  "input": {
+    "pagination": { "size": 5, "page": 0 },
+    "order": {
+      "createdAt": "DESC",
+      "nickname": "ASC"
+    },
+    "where": {
+      "role": "USER",
+      "nickname": { "$iContains": "test" }
+    }
+  }
+}
+```
+
+#### Read with Filtering
+
+```graphql
+query GetUsers($input: GetManyInput) {
+  getManyUserList(input: $input) {
+    data {
+      id
+      nickname
+      role
+      createdAt
+    }
+    count
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "input": {
+    "pagination": { "size": 10, "page": 0 },
+    "order": { "createdAt": "DESC" },
+    "where": {
+      "role": { "$eq": "ADMIN" },
+      "email": { "$iContains": "@company.com" }
+    }
+  }
+}
+```
+
+#### Update
+
+```graphql
+mutation UpdateUser($id: String!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    id
+    email
+    firstName
+    lastName
+    updatedAt
+  }
+}
+```
+
+#### Delete (Soft Delete)
+
+```graphql
+mutation DeleteUser($id: String!) {
+  deleteUser(id: $id)
+}
+```
+
+#### Restore
+
+```graphql
+mutation RestoreUser($id: String!) {
+  restoreUser(id: $id)
+}
+```
+
+### Available Filter Operators
+
+- **`$eq`, `$ne`** - Equal, Not equal
+- **`$gt`, `$gte`, `$lt`, `$lte`** - Comparisons
+- **`$in`, `$nIn`** - In array, Not in array
+- **`$contains`, `$nContains`** - Pattern matching (case-sensitive)
+- **`$iContains`, `$nIContains`** - Pattern matching (case-insensitive)
+- **`$null`, `$nNull`** - Null check
+- **`$between`** - Between two values
+
+**Note:** Simple values like `"role": "USER"` are automatically treated as `$eq` operators.
+
+## ⚡ Code Generator
+
+Generate complete CRUD operations with a single command:
+
+```bash
+yarn g
+```
+
+**Features:**
+
+- Entity with TypeORM decorators
+- GraphQL resolvers and inputs
+- Service with business logic
+- Repository with database operations
+- Unit and integration tests
+- Soft delete support
+
+**Generated files:**
+
+- `src/{entity}/entities/{entity}.entity.ts`
+- `src/{entity}/inputs/{entity}.input.ts`
+- `src/{entity}/{entity}.module.ts`
+- `src/{entity}/{entity}.resolver.ts`
+- `src/{entity}/{entity}.service.ts`
+- `src/{entity}/{entity}.repository.ts`
+- Test files
+
+## 🚀 CI/CD
+
+### GitHub Actions
+
+- Automated testing on push/PR
+- Set `ENV` secret with base64-encoded `.test.env` content
+
+### Husky Git Hooks
+
+```bash
+yarn prepare  # Setup git hooks
+```
+
+**Pre-commit:** Linting
+**Pre-push:** Prevent main branch pushes
+
+## 📝 Available Scripts
+
+```bash
+# Development
+yarn dev          # Start development server
+yarn build        # Build for production
+yarn start        # Start production server
+
+# Database
+yarn migration:generate  # Generate migration
+yarn migration:run       # Run migrations
+yarn migration:revert    # Revert migration
+yarn migration:show      # Show migration status
+
+# Testing
+yarn test:unit           # Unit tests
+yarn test:integration    # Integration tests
+yarn test:e2e:docker      # E2E tests
+
+# Code Quality
+yarn lint               # Lint code
+yarn lint:fix           # Fix linting issues
+yarn format             # Format code
+
+# Generator
+yarn g                  # Generate CRUD
+```
+
+## 🏗️ Project Structure
+
+```
+src/
+├── auth/                 # Authentication module
+├── cache/                # Caching decorators
+├── common/               # Shared utilities
+│   ├── config/          # Configuration
+│   ├── database/        # Migrations
+│   ├── decorators/      # Custom decorators
+│   ├── exceptions/      # Error handling
+│   ├── graphql/         # GraphQL utilities
+│   └── guards/          # Authentication guards
+├── user/                 # User module (example)
+└── main.ts              # Application entry point
+```
 
 ## 11. TDD
 
@@ -490,30 +646,3 @@ db.public.registerFunction({
   implementation: () => 'test',
 });
 ```
-
-## 14. Todo
-
-- [x] TDD
-
-  - [x] Unit Test (Use mock)
-  - [x] Integration Test (Use in-memory DB)
-  - [x] End To End Test (Use docker)
-
-- [x] CI
-
-  - [x] Github actions
-  - [x] husky
-
-- [x] GraphQL Upload
-- [x] Healthcheck
-- [x] Divide usefactory
-- [x] SWC Compiler
-- [x] Refresh Token
-- [x] Caching
-- [ ] Graphql Subscription
-- [x] Remove lodash
-- [ ] [CASL](https://docs.nestjs.com/security/authorization#integrating-casl)
-
-## 15. License
-
-MIT
