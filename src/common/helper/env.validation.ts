@@ -10,6 +10,8 @@ import {
   validateSync,
 } from 'class-validator';
 
+import { processEnvVars } from './env.helper';
+
 enum NODE_ENVIRONMENT {
   development,
   production,
@@ -78,9 +80,16 @@ export class EnvironmentVariables {
 }
 
 export function envValidation(config: Record<string, unknown>) {
-  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
-    enableImplicitConversion: true,
-  });
+  // First process the environment variables to handle multiline strings
+  const processedConfig = processEnvVars(config);
+
+  const validatedConfig = plainToInstance(
+    EnvironmentVariables,
+    processedConfig,
+    {
+      enableImplicitConversion: true,
+    },
+  );
   const errors = validateSync(validatedConfig, {
     skipMissingProperties: false,
   });
