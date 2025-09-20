@@ -36,7 +36,23 @@ export const setTypeormConfig = (
       join(cwd(), 'dist', 'common', 'database', 'migrations', '*{.ts,.js}'),
     ],
     migrationsRun: false,
-    logging: false,
+    logging: true, // Enable logging to see what's happening
+    ssl:
+      getConfigValue('DB_SSL') === 'true'
+        ? {
+            rejectUnauthorized:
+              getConfigValue('DB_SSL_REJECT_UNAUTHORIZED') !== 'false',
+          }
+        : false,
+    extra:
+      getConfigValue('DB_SSL') === 'true'
+        ? {
+            ssl: {
+              rejectUnauthorized:
+                getConfigValue('DB_SSL_REJECT_UNAUTHORIZED') !== 'false',
+            },
+          }
+        : undefined,
   };
 };
 
